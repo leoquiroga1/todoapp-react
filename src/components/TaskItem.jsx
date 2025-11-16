@@ -7,16 +7,16 @@ const TaskItem = ({ task, onEdit, onDelete, onToggleComplete }) => {
         <h3>{task.title}</h3>
         <div className="task-item-actions">
           <button onClick={() => onToggleComplete(task.id)}>
-            {task.completed ? "Undo" : "Complete"}
+            {task.completed ? "Deshacer" : "Completar"}
           </button>
-          <button onClick={() => onEdit(task)}>Edit</button>
-          <button onClick={() => onDelete(task.id)}>Delete</button>
+          <button onClick={() => onEdit(task)}>Editar</button>
+          <button onClick={() => onDelete(task.id)}>Eliminar</button>
         </div>
       </div>
       <p>{task.description}</p>
       <div className="task-item-footer">
-        <span>Due: {task.dueDate}</span>
-        <span>Priority: {task.priority}</span>
+        <span>Vencimiento: {task.dueDate}</span>
+        <span>Prioridad: {task.priority}</span>
       </div>
     </div>
   );

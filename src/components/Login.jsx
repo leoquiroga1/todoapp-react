@@ -12,22 +12,22 @@ const Login = ({ onLogin }) => {
 
   return (
     <form onSubmit={handleSubmit} className="login-form">
-      <h2>Login</h2>
+      <h2>Iniciar Sesión</h2>
       <input
         type="email"
-        placeholder="Email"
+        placeholder="Correo Electrónico"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
       />
       <input
         type="password"
-        placeholder="Password"
+        placeholder="Contraseña"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <button type="submit">Login</button>
+      <button type="submit">Iniciar Sesión</button>
     </form>
   );
 };

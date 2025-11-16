@@ -39,14 +39,14 @@ const TaskForm = ({ onSave, taskToEdit }) => {
       <input
         type="text"
         name="title"
-        placeholder="Title"
+        placeholder="Título"
         value={task.title}
         onChange={handleChange}
         required
       />
       <textarea
         name="description"
-        placeholder="Description"
+        placeholder="Descripción"
         value={task.description}
         onChange={handleChange}
       ></textarea>
@@ -57,11 +57,11 @@ const TaskForm = ({ onSave, taskToEdit }) => {
         onChange={handleChange}
       />
       <select name="priority" value={task.priority} onChange={handleChange}>
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
+        <option value="High">Alta</option>
+        <option value="Medium">Media</option>
+        <option value="Low">Baja</option>
       </select>
-      <button type="submit">Save Task</button>
+      <button type="submit">Guardar Tarea</button>
     </form>
   );
 };

@@ -5,14 +5,14 @@ const SearchBar = ({ onSearch, onFilter }) => {
     <div className="search-bar">
       <input
         type="text"
-        placeholder="Search tasks..."
+        placeholder="Buscar tareas..."
         onChange={(e) => onSearch(e.target.value)}
       />
       <select onChange={(e) => onFilter(e.target.value)}>
-        <option value="all">All</option>
-        <option value="pending">Pending</option>
-        <option value="in-progress">In Progress</option>
-        <option value="completed">Completed</option>
+        <option value="all">Todas</option>
+        <option value="pending">Pendiente</option>
+        <option value="in-progress">En Progreso</option>
+        <option value="completed">Completada</option>
       </select>
     </div>
   );

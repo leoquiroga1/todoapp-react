@@ -84,8 +84,8 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1>Todo App</h1>
-        <button onClick={handleLogout}>Logout</button>
+        <h1>Aplicación de Tareas</h1>
+        <button onClick={handleLogout}>Cerrar Sesión</button>
       </header>
       <main>
         <TaskForm onSave={handleSaveTask} taskToEdit={editingTask} />
