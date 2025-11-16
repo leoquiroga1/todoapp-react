@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import TaskList from "./components/TaskList";
 import TaskForm from "./components/TaskForm";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import SearchBar from "./components/SearchBar";
+import { auth, db } from "./firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -12,29 +24,47 @@ function App() {
   const [editingTask, setEditingTask] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
 
-  const handleRegister = (newUser) => {
-    // In a real app, this would involve a server call
-    setUser(newUser);
-  };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
-  const handleLogin = (credentials) => {
-    // In a real app, this would involve a server call
-    setUser({ email: credentials.email });
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-  };
-
-  const handleSaveTask = (task) => {
-    if (task.id) {
-      setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
+  useEffect(() => {
+    if (user) {
+      const q = query(collection(db, "tasks"), where("userId", "==", user.uid));
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const tasksData = [];
+        querySnapshot.forEach((doc) => {
+          tasksData.push({ ...doc.data(), id: doc.id });
+        });
+        setTasks(tasksData);
+      });
+      return () => unsubscribe();
     } else {
-      setTasks([
-        ...tasks,
-        { ...task, id: Date.now(), completed: false, status: "pending" },
-      ]);
+      setTasks([]);
+    }
+  }, [user]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
+  const handleSaveTask = async (task) => {
+    if (task.id) {
+      const taskDoc = doc(db, "tasks", task.id);
+      await updateDoc(taskDoc, task);
+    } else {
+      await addDoc(collection(db, "tasks"), {
+        ...task,
+        userId: user.uid,
+        completed: false,
+        status: "pending",
+      });
     }
     setEditingTask(null);
   };
@@ -43,40 +73,43 @@ function App() {
     setEditingTask(task);
   };
 
-  const handleDelete = (taskId) => {
-    setTasks(tasks.filter((t) => t.id !== taskId));
+  const handleDelete = async (taskId) => {
+    const taskDoc = doc(db, "tasks", taskId);
+    await deleteDoc(taskDoc);
   };
 
-  const handleToggleComplete = (taskId) => {
-    setTasks(
-      tasks.map((t) =>
-        t.id === taskId
-          ? {
-              ...t,
-              completed: !t.completed,
-              status: !t.completed ? "completed" : "pending",
-            }
-          : t
-      )
-    );
+  const handleToggleComplete = async (taskId) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (task) {
+      const taskDoc = doc(db, "tasks", taskId);
+      await updateDoc(taskDoc, {
+        completed: !task.completed,
+        status: !task.completed ? "completed" : "pending",
+      });
+    }
   };
 
   const filteredTasks = tasks
     .filter(
       (task) =>
         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.description.toLowerCase().includes(searchTerm.toLowerCase())
+        (task.description &&
+          task.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter((task) => {
       if (filter === "all") return true;
       return task.status === filter;
     });
 
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
   if (!user) {
     return (
       <div className="App">
-        <Login onLogin={handleLogin} />
-        <Register onRegister={handleRegister} />
+        <Login />
+        <Register />
       </div>
     );
   }
